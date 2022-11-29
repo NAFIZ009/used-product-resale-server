@@ -13,6 +13,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 const categoriesCollection=client.db("tv-bazar").collection("category");
 const reviewsCollection=client.db("tv-bazar").collection("reviews");
+const productsCollection=client.db("tv-bazar").collection("products");
 
 
 app.get('/',(req,res)=>{
@@ -24,7 +25,7 @@ app.get('/category',async(req,res)=>{
         const categories=await categoriesCollection.find({}).toArray();
         res.send(categories);
     }catch{
-        res.status(404)
+        // res.status(404)
     }
 });
 
@@ -33,11 +34,23 @@ app.get('/reviews',async(req,res)=>{
         const reviews=await reviewsCollection.find({}).toArray();
         res.send(reviews);
     }catch{
-        res.status(404)
+        // res.status(404)
     }
 });
 
+app.get('/products',async(req,res)=>{
+    try{
+        const products=await productsCollection.find({}).toArray();
+        res.send(products);
+    }catch{
 
+    }
+});
+
+app.get('/shop',async(req,res)=>{
+    const query=req.query;
+    console.log(query);
+});
 
 app.listen(port,()=>{
     console.log("listening on port",port);
