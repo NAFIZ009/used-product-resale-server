@@ -14,6 +14,8 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 const categoriesCollection=client.db("tv-bazar").collection("category");
 const reviewsCollection=client.db("tv-bazar").collection("reviews");
 const productsCollection=client.db("tv-bazar").collection("products");
+const ordersCollection=client.db("tv-bazar").collection("orders");
+const users=client.db("tv-bazar").collection("users");
 
 
 app.get('/',(req,res)=>{
@@ -48,8 +50,34 @@ app.get('/products',async(req,res)=>{
 });
 
 app.get('/shop',async(req,res)=>{
-    const query=req.query;
-    console.log(query);
+    try{
+        const query=req.query;
+        const products= await productsCollection.find(query).toArray();
+        res.send(products);
+    }catch{
+
+    }
+});
+
+app.post('/orders',async(req,res)=>{
+    try{
+        const orderInfo=req.body;
+        const result=await ordersCollection.insertOne(orderInfo);
+        res.send(result);
+    }catch{
+
+    }
+});
+
+
+app.post('/user',async(req,res)=>{
+    try{
+        const userInfo=req.body;
+        const result=await users.insertOne(userInfo);
+        res.send(result);
+    }catch{
+
+    }
 });
 
 app.listen(port,()=>{
