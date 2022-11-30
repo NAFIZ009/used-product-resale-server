@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(cors());
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://nafiz:${process.env.DB_PASS}@cluster0.qt8enez.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -79,6 +79,47 @@ app.post('/user',async(req,res)=>{
 
     }
 });
+
+
+app.get('/user/:email',async(req,res)=>{
+    try{
+        const email=req.params.email;
+        const query={
+            email:email
+        }
+        const result=await users.find(query).toArray();
+        res.send(result);
+    }catch{
+
+    }
+});
+
+app.get('/dashboard/myOrder',async(req,res)=>{
+    const email=req.headers.email;
+    const query={
+        email:email
+    };
+    const user=await users.find(query).toArray();
+    if(user[0].role==="buyer"){
+        const orderQuery={
+            buyersEmail:email
+        }
+        const orders=await ordersCollection.find(orderQuery).toArray();
+        const productId=orders.map(order=>order.productId);
+        const products=await productsCollection.find({}).toArray();
+        
+        const OrderedProducts=productId.map((id)=>{
+            const product= products.find(pro=>pro._id==id);
+            return {
+                productName:product.productName,
+                productImg:product.img,
+                productPrice:product.resalePrice
+            };
+        })
+        res.send(OrderedProducts);
+    }
+})
+
 
 app.listen(port,()=>{
     console.log("listening on port",port);
